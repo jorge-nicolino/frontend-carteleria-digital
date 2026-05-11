@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -20,64 +20,61 @@ function PrivateRoute({ children }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
+    <Routes>
+      <Route path="/" element={<Login />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
 
-        <Route
-          path="/contents"
-          element={
-            <PrivateRoute>
-              <RoleRoute allowedRoles={["admin", "marketing"]}>
-                <Contents />
-              </RoleRoute>
-            </PrivateRoute>
-          }
-        />
+      <Route
+        path="/contents"
+        element={
+          <PrivateRoute>
+            <RoleRoute allowedRoles={["admin", "marketing"]}>
+              <Contents />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
 
-        <Route
-          path="/playlists"
-          element={
-            <PrivateRoute>
-              <RoleRoute allowedRoles={["admin", "marketing"]}>
-                <Playlists />
-              </RoleRoute>
-            </PrivateRoute>
-          }
-        />
+      <Route
+        path="/playlists"
+        element={
+          <PrivateRoute>
+            <RoleRoute allowedRoles={["admin", "marketing"]}>
+              <Playlists />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
 
-        <Route
-          path="/screens"
-          element={
-            <PrivateRoute>
-              <RoleRoute allowedRoles={["admin"]}>
-                <Screens />
-              </RoleRoute>
-            </PrivateRoute>
-          }
-        />
+      <Route
+        path="/screens"
+        element={
+          <PrivateRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <Screens />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
 
-        <Route
-          path="/playlists/:id"
-          element={
-            <PrivateRoute>
-              <RoleRoute allowedRoles={["admin", "marketing"]}>
-                <PlaylistDetail />
-              </RoleRoute>
-            </PrivateRoute>
-          }
-        />
-
-      </Routes>
-    </BrowserRouter>
+      <Route
+        path="/playlists/:id"
+        element={
+          <PrivateRoute>
+            <RoleRoute allowedRoles={["admin", "marketing"]}>
+              <PlaylistDetail />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }
