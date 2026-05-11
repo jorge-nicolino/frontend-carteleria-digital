@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/client";
 import Layout from "../components/Layout";
 
@@ -16,8 +17,8 @@ function formatDateArgentina(dateString) {
 }
 
 export default function Dashboard() {
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-
     const isAdmin = user.role === "admin";
 
     const [contents, setContents] = useState([]);
@@ -58,15 +59,27 @@ export default function Dashboard() {
     function logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/";
+        navigate("/");
     }
 
     const onlineScreens = screens.filter((screen) => screen.last_connection).length;
 
     return (
         <Layout>
-            <h1 style={{ color: "#003366", marginBottom: 8 }}>Panel de Cartelería Digital</h1>
-            <p style={{ color: "#64748b", marginBottom: 24 }}>Bienvenido, <strong>{user.name}</strong></p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                    <h1 style={{ color: "#003366", marginBottom: 8 }}>
+                        Panel de Cartelería Digital
+                    </h1>
+                    <p style={{ color: "#64748b", marginBottom: 24 }}>
+                        Bienvenido, <strong>{user.name || "Usuario"}</strong>
+                    </p>
+                </div>
+
+                <button onClick={logout} style={logoutButtonStyle}>
+                    Cerrar sesión
+                </button>
+            </div>
 
             <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "24px 0" }} />
 
@@ -94,15 +107,17 @@ export default function Dashboard() {
 
             {isAdmin && (
                 <>
-                    <h2 style={{ color: "#003366", fontSize: 20, marginTop: 40, marginBottom: 20 }}>Pantallas</h2>
+                    <h2 style={{ color: "#003366", fontSize: 20, marginTop: 40, marginBottom: 20 }}>
+                        Pantallas
+                    </h2>
 
-                    <div style={{ background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}>
-                        <table
-                            style={{
-                                borderCollapse: "collapse",
-                                width: "100%",
-                            }}
-                        >
+                    <div style={{
+                        background: "white",
+                        borderRadius: 14,
+                        overflowX: "auto",
+                        boxShadow: "0 8px 20px rgba(0,0,0,0.08)"
+                    }}>
+                        <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <thead>
                                 <tr style={{ background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)" }}>
                                     <th style={tableHeaderStyle}>Nombre</th>
@@ -118,9 +133,22 @@ export default function Dashboard() {
                                     <tr key={screen.id} style={{ borderTop: "1px solid #e5e7eb" }}>
                                         <td style={tableCellStyle}>{screen.name}</td>
                                         <td style={tableCellStyle}>{screen.location}</td>
-                                        <td style={tableCellStyle}><code style={{ background: "#f3f4f6", padding: "4px 8px", borderRadius: 4, fontSize: 12 }}>{screen.device_id}</code></td>
-                                        <td style={tableCellStyle}>{screen.playlists?.name || <em style={{ color: "#94a3b8" }}>Sin playlist</em>}</td>
-                                        <td style={tableCellStyle}>{formatDateArgentina(screen.last_connection)}</td>
+                                        <td style={tableCellStyle}>
+                                            <code style={{
+                                                background: "#f3f4f6",
+                                                padding: "4px 8px",
+                                                borderRadius: 4,
+                                                fontSize: 12
+                                            }}>
+                                                {screen.device_id}
+                                            </code>
+                                        </td>
+                                        <td style={tableCellStyle}>
+                                            {screen.playlists?.name || <em style={{ color: "#94a3b8" }}>Sin playlist</em>}
+                                        </td>
+                                        <td style={tableCellStyle}>
+                                            {formatDateArgentina(screen.last_connection)}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -139,7 +167,6 @@ const cardStyle = {
     minWidth: 190,
     border: "1px solid #e5e7eb",
     boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-    transition: "all 0.3s ease",
 };
 
 const numberStyle = {
@@ -170,4 +197,14 @@ const tableCellStyle = {
     padding: "14px 16px",
     color: "#374151",
     fontSize: 14,
+};
+
+const logoutButtonStyle = {
+    background: "#E63946",
+    color: "white",
+    border: "none",
+    padding: "10px 16px",
+    borderRadius: 10,
+    cursor: "pointer",
+    fontWeight: 600,
 };
