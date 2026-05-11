@@ -1,0 +1,40 @@
+:root {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+
+  --color-primary: #0b2447;
+  --color-primary-light: #19376d;
+
+  --color-success: #0f9d58;
+  --color-warning: #f4b400;
+  --color-error: #e63946;
+
+  --color-text: #1f2937;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+
+  --radius: 14px;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: Arial, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
