@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/client";
 import "./Login.css";
 
 export default function Login() {
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("admin@colegio.com");
     const [password, setPassword] = useState("admin1234");
     const [error, setError] = useState("");
@@ -22,7 +25,7 @@ export default function Login() {
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
 
-            window.location.href = "/dashboard";
+            navigate("/dashboard");
         } catch (err) {
             setError(
                 err.response?.data?.message || "Error al iniciar sesión"
