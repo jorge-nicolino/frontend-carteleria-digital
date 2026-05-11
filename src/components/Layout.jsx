@@ -1,125 +1,70 @@
-import { Link, useLocation } from "react-router-dom";
+export default function AlertMessage({ type = "success", message, onClose }) {
+    if (!message) return null;
 
-export default function Layout({ children }) {
-    const location = useLocation();
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const config = {
+        success: {
+            icon: "✅",
+            background: "linear-gradient(135deg, #e6f4ea 0%, #d1f0e0 100%)",
+            color: "#0f9d58",
+            border: "#0f9d58",
+        },
+        error: {
+            icon: "❌",
+            background: "linear-gradient(135deg, #fde8ea 0%, #fcd5d9 100%)",
+            color: "#e63946",
+            border: "#e63946",
+        },
+        warning: {
+            icon: "⚠️",
+            background: "linear-gradient(135deg, #fff7db 0%, #ffeed4 100%)",
+            color: "#9a6b00",
+            border: "#f4b400",
+        },
+    };
 
-    function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/";
-    }
-
-    const navItems = [
-        {
-            path: "/dashboard",
-            label: "Dashboard",
-            roles: ["admin", "marketing", "viewer"],
-        },
-        {
-            path: "/contents",
-            label: "Contenidos",
-            roles: ["admin", "marketing"],
-        },
-        {
-            path: "/playlists",
-            label: "Playlists",
-            roles: ["admin", "marketing"],
-        },
-        {
-            path: "/screens",
-            label: "Pantallas",
-            roles: ["admin"],
-        },
-    ];
+    const selected = config[type] || config.success;
 
     return (
-        <div style={layoutStyle}>
-            <aside style={sidebarStyle}>
-                <h2 style={logoStyle}>Cartelería Digital</h2>
-                <p style={userStyle}>{user.name}</p>
+        <div
+            style={{
+                background: selected.background,
+                color: selected.color,
+                border: `2px solid ${selected.border}`,
+                borderRadius: 12,
+                padding: "14px 16px",
+                margin: "16px 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 600,
+                fontSize: 14,
+                animation: "slideInDown 0.4s ease-out",
+            }}
+        >
+            <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 18 }}>{selected.icon}</span>
+                <span>{message}</span>
+            </span>
 
-                <nav style={navStyle}>
-                    {navItems
-                        .filter((item) => item.roles.includes(user.role))
-                        .map((item) => {
-                            const active = location.pathname === item.path;
-
-                            return (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    style={{
-                                        ...linkStyle,
-                                        background: active ? "#19376D" : "transparent",
-                                        color: active ? "#ffffff" : "#dbeafe",
-                                    }}
-                                >
-                                    {item.label}
-                                </Link>
-                            );
-                        })}
-                </nav>
-
-                <button onClick={logout} style={logoutStyle}>
-                    Cerrar sesión
+            {onClose && (
+                <button
+                    onClick={onClose}
+                    style={{
+                        border: "none",
+                        background: "transparent",
+                        fontSize: 20,
+                        cursor: "pointer",
+                        color: selected.color,
+                        padding: 0,
+                        transition: "transform 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => e.target.style.transform = "scale(1.2)"}
+                    onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+                >
+                    ×
                 </button>
-            </aside>
-
-            <main style={mainStyle}>{children}</main>
+            )}
         </div>
     );
 }
-
-const layoutStyle = {
-    display: "flex",
-    minHeight: "100vh",
-    background: "var(--color-bg)",
-};
-
-const sidebarStyle = {
-    width: 260,
-    background: "var(--color-primary)",
-    color: "white",
-    padding: 24,
-    display: "flex",
-    flexDirection: "column",
-};
-
-const logoStyle = {
-    margin: 0,
-    fontSize: 22,
-};
-
-const userStyle = {
-    color: "#cbd5e1",
-    marginBottom: 30,
-};
-
-const navStyle = {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    flex: 1,
-};
-
-const linkStyle = {
-    textDecoration: "none",
-    padding: "12px 14px",
-    borderRadius: 10,
-    fontWeight: 600,
-};
-
-const logoutStyle = {
-    background: "#E63946",
-    color: "white",
-    border: "none",
-    padding: "12px",
-    borderRadius: 10,
-    fontWeight: "bold",
-};
-
-const mainStyle = {
-    flex: 1,
-    padding: 30,
-};

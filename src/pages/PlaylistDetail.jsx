@@ -93,8 +93,8 @@ export default function PlaylistDetail() {
 
     return (
         <Layout>
-            <h1>Detalle de Playlist</h1>
-            <p>Agregá contenidos y definí el orden de reproducción.</p>
+            <h1 style={{ color: "#003366", marginBottom: 8 }}>Detalle de Playlist</h1>
+            <p style={{ color: "#64748b", marginBottom: 24 }}>Agregá contenidos y definí el orden de reproducción.</p>
 
             <AlertMessage
                 type={alert.type}
@@ -103,7 +103,7 @@ export default function PlaylistDetail() {
             />
 
             <form onSubmit={handleAddContent} style={formStyle}>
-                <h2>Agregar contenido</h2>
+                <h2 style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Agregar contenido</h2>
 
                 <label>Contenido</label>
                 <select
@@ -140,48 +140,57 @@ export default function PlaylistDetail() {
                 <button style={buttonStyle}>Agregar a playlist</button>
             </form>
 
-            <h2 style={{ marginTop: 35 }}>Contenidos en esta playlist</h2>
+            <h2 style={{ color: "#003366", fontSize: 20, marginTop: 35, marginBottom: 20 }}>Contenidos en esta playlist</h2>
 
             <div style={gridStyle}>
-                {items.map((item) => (
-                    <div key={item.id} style={cardStyle}>
-                        {item.contents?.type === "image" ? (
-                            <img
-                                src={item.contents.file_url}
-                                alt={item.contents.title}
-                                style={previewStyle}
-                            />
-                        ) : (
-                            <video
-                                src={item.contents?.file_url}
-                                controls
-                                style={previewStyle}
-                            />
-                        )}
+                {items.length === 0 ? (
+                    <p style={{ color: "#94a3b8", gridColumn: "1/-1", textAlign: "center", padding: 40 }}>
+                        No hay contenidos en esta playlist
+                    </p>
+                ) : (
+                    items.map((item) => (
+                        <div key={item.id} style={cardStyle}>
+                            {item.contents?.type === "image" ? (
+                                <img
+                                    src={item.contents.file_url}
+                                    alt={item.contents.title}
+                                    style={previewStyle}
+                                />
+                            ) : (
+                                <video
+                                    src={item.contents?.file_url}
+                                    controls
+                                    style={previewStyle}
+                                />
+                            )}
 
-                        <h3>{item.order_index}. {item.contents?.title}</h3>
-                        <p>{item.contents?.description}</p>
-                        <p>
-                            <strong>Duración:</strong>{" "}
-                            {item.duration_seconds || item.contents?.duration_seconds}s
-                        </p>
-                        <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            style={{
-                                width: "100%",
-                                padding: 10,
-                                background: "var(--color-error)",
-                                color: "white",
-                                border: "none",
-                                borderRadius: 8,
-                                fontWeight: "bold",
-                                marginTop: 10,
-                            }}
-                        >
-                            Quitar de playlist
-                        </button>
-                    </div>
-                ))}
+                            <h3 style={{ color: "#003366", fontSize: 16, margin: "14px 0 6px" }}>
+                                {item.order_index}. {item.contents?.title}
+                            </h3>
+                            <p style={{ color: "#64748b", fontSize: 13, margin: "0 0 10px" }}>{item.contents?.description}</p>
+                            <p style={{ color: "#64748b", fontSize: 12, margin: "0 0 10px" }}>
+                                <strong>Duración:</strong> {item.duration_seconds || item.contents?.duration_seconds}s
+                            </p>
+                            <button
+                                onClick={() => handleRemoveItem(item.id)}
+                                style={{
+                                    width: "100%",
+                                    padding: 10,
+                                    background: "#ef4444",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: 8,
+                                    fontWeight: "bold",
+                                    marginTop: 10,
+                                    cursor: "pointer",
+                                    transition: "all 0.3s ease",
+                                }}
+                            >
+                                Quitar de playlist
+                            </button>
+                        </div>
+                    ))
+                )}
             </div>
         </Layout>
     );
@@ -191,8 +200,8 @@ const formStyle = {
     background: "white",
     padding: 24,
     borderRadius: 14,
-    border: "1px solid var(--color-border)",
-    boxShadow: "var(--shadow)",
+    border: "1px solid #e5e7eb",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
     maxWidth: 520,
 };
 
@@ -201,18 +210,24 @@ const inputStyle = {
     padding: 12,
     marginTop: 6,
     marginBottom: 14,
-    border: "1px solid var(--color-border)",
+    border: "2px solid #e5e7eb",
     borderRadius: 10,
+    fontFamily: "inherit",
+    fontSize: 15,
+    transition: "all 0.3s ease",
 };
 
 const buttonStyle = {
     width: "100%",
     padding: 13,
-    background: "var(--color-primary)",
+    background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)",
     color: "white",
     border: "none",
     borderRadius: 10,
     fontWeight: "bold",
+    fontSize: 15,
+    cursor: "pointer",
+    transition: "all 0.3s ease",
 };
 
 const gridStyle = {
@@ -223,16 +238,17 @@ const gridStyle = {
 
 const cardStyle = {
     background: "white",
-    border: "1px solid var(--color-border)",
+    border: "1px solid #e5e7eb",
     borderRadius: 14,
     padding: 16,
-    boxShadow: "var(--shadow)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+    transition: "all 0.3s ease",
 };
 
 const previewStyle = {
     width: "100%",
     height: 160,
     objectFit: "contain",
-    background: "#111827",
+    background: "#f3f4f6",
     borderRadius: 10,
 };

@@ -65,10 +65,10 @@ export default function Dashboard() {
 
     return (
         <Layout>
-            <h1>Panel de Cartelería Digital</h1>
-            <p>Bienvenido, {user.name}</p>
+            <h1 style={{ color: "#003366", marginBottom: 8 }}>Panel de Cartelería Digital</h1>
+            <p style={{ color: "#64748b", marginBottom: 24 }}>Bienvenido, <strong>{user.name}</strong></p>
 
-            <hr />
+            <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "24px 0" }} />
 
             <div style={{ display: "flex", gap: 20, marginTop: 30, flexWrap: "wrap" }}>
                 <div style={cardStyle}>
@@ -94,38 +94,38 @@ export default function Dashboard() {
 
             {isAdmin && (
                 <>
-                    <h2 style={{ marginTop: 40 }}>Pantallas</h2>
+                    <h2 style={{ color: "#003366", fontSize: 20, marginTop: 40, marginBottom: 20 }}>Pantallas</h2>
 
-                    <table
-                        border="1"
-                        cellPadding="10"
-                        style={{
-                            borderCollapse: "collapse",
-                            width: "100%",
-                        }}
-                    >
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Ubicación</th>
-                                <th>Device ID</th>
-                                <th>Playlist</th>
-                                <th>Última conexión</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {screens.map((screen) => (
-                                <tr key={screen.id}>
-                                    <td>{screen.name}</td>
-                                    <td>{screen.location}</td>
-                                    <td>{screen.device_id}</td>
-                                    <td>{screen.playlists?.name || "Sin playlist"}</td>
-                                    <td>{formatDateArgentina(screen.last_connection)}</td>
+                    <div style={{ background: "white", borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}>
+                        <table
+                            style={{
+                                borderCollapse: "collapse",
+                                width: "100%",
+                            }}
+                        >
+                            <thead>
+                                <tr style={{ background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)" }}>
+                                    <th style={tableHeaderStyle}>Nombre</th>
+                                    <th style={tableHeaderStyle}>Ubicación</th>
+                                    <th style={tableHeaderStyle}>Device ID</th>
+                                    <th style={tableHeaderStyle}>Playlist</th>
+                                    <th style={tableHeaderStyle}>Última conexión</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+
+                            <tbody>
+                                {screens.map((screen) => (
+                                    <tr key={screen.id} style={{ borderTop: "1px solid #e5e7eb" }}>
+                                        <td style={tableCellStyle}>{screen.name}</td>
+                                        <td style={tableCellStyle}>{screen.location}</td>
+                                        <td style={tableCellStyle}><code style={{ background: "#f3f4f6", padding: "4px 8px", borderRadius: 4, fontSize: 12 }}>{screen.device_id}</code></td>
+                                        <td style={tableCellStyle}>{screen.playlists?.name || <em style={{ color: "#94a3b8" }}>Sin playlist</em>}</td>
+                                        <td style={tableCellStyle}>{formatDateArgentina(screen.last_connection)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </>
             )}
         </Layout>
@@ -139,17 +139,35 @@ const cardStyle = {
     minWidth: 190,
     border: "1px solid #e5e7eb",
     boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+    transition: "all 0.3s ease",
 };
 
 const numberStyle = {
-    color: "#2563eb",
+    color: "#003366",
     fontSize: 38,
     margin: 0,
     fontWeight: "bold",
 };
 
 const labelStyle = {
-    color: "#374151",
+    color: "#64748b",
     margin: "8px 0 0",
     fontWeight: "500",
+    fontSize: 14,
+};
+
+const tableHeaderStyle = {
+    color: "white",
+    padding: "14px 16px",
+    textAlign: "left",
+    fontWeight: "600",
+    fontSize: 13,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+};
+
+const tableCellStyle = {
+    padding: "14px 16px",
+    color: "#374151",
+    fontSize: 14,
 };

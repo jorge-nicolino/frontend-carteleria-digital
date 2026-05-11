@@ -38,26 +38,40 @@ export default function Login() {
     return (
         <div className="login-page">
             <form className="login-card" onSubmit={handleSubmit}>
+                <div className="logo-container">
+                    <img 
+                        src="/logo_igmb.png" 
+                        alt="Logo IGMB"
+                        className="logo-image"
+                    />
+                </div>
+
                 <h1>Cartelería Digital</h1>
-                <p>Panel administrativo del colegio</p>
+                <p>Panel administrativo del Instituto General Manuel Belgrano</p>
 
                 {error && <div className="login-error">{error}</div>}
 
-                <label>Email</label>
+                <label htmlFor="email">Email</label>
                 <input
+                    id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder="tu@email.com"
+                    disabled={loading}
                 />
 
-                <label>Contraseña</label>
+                <label htmlFor="password">Contraseña</label>
                 <input
+                    id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    disabled={loading}
                 />
 
-                <button disabled={loading}>
+                <button disabled={loading} type="submit">
                     {loading ? "Ingresando..." : "Ingresar"}
                 </button>
             </form>

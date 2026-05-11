@@ -116,8 +116,8 @@ export default function Contents() {
 
     return (
         <Layout>
-            <h1>Gestión de Contenidos</h1>
-            <p>Subí imágenes, flyers o videos para la cartelería digital.</p>
+            <h1 style={{ color: "#003366", marginBottom: 8 }}>Gestión de Contenidos</h1>
+            <p style={{ color: "#64748b", marginBottom: 24 }}>Subí imágenes, flyers o videos para la cartelería digital.</p>
 
             <AlertMessage
                 type={alert.type}
@@ -126,7 +126,7 @@ export default function Contents() {
             />
 
             <form onSubmit={handleSubmit} style={formStyle}>
-                <h2>Nuevo contenido</h2>
+                <h2 style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Nuevo contenido</h2>
 
                 <label>Título</label>
                 <input
@@ -144,6 +144,14 @@ export default function Contents() {
                     placeholder="Descripción opcional"
                 />
 
+                <label>Duración (segundos)</label>
+                <input
+                    style={inputStyle}
+                    type="number"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    min="1"
+                />
 
                 <label>Archivo</label>
                 <input
@@ -158,7 +166,7 @@ export default function Contents() {
                 </button>
             </form>
 
-            <h2 style={{ marginTop: 40 }}>Contenidos cargados</h2>
+            <h2 style={{ color: "#003366", fontSize: 20, marginTop: 40, marginBottom: 20 }}>Contenidos cargados</h2>
 
             <div style={gridStyle}>
                 {contents.map((content) => (
@@ -207,8 +215,8 @@ export default function Contents() {
                             </form>
                         ) : (
                             <>
-                                <h3>{content.title}</h3>
-                                <p>{content.description}</p>
+                                <h3 style={{ color: "#003366", fontSize: 16, marginTop: 14, marginBottom: 6 }}>{content.title}</h3>
+                                <p style={{ color: "#64748b", fontSize: 13, marginBottom: 10 }}>{content.description}</p>
 
                                 <button
                                     onClick={() => startEdit(content)}
@@ -222,7 +230,7 @@ export default function Contents() {
                             </>
                         )}
 
-                        <p>
+                        <p style={{ color: "#64748b", fontSize: 12, marginTop: 12, marginBottom: 0 }}>
                             <strong>Tipo:</strong> {content.type}
                         </p>
 
@@ -248,20 +256,24 @@ const inputStyle = {
     padding: 12,
     marginTop: 6,
     marginBottom: 14,
-    border: "1px solid #d1d5db",
+    border: "2px solid #e5e7eb",
     borderRadius: 10,
     fontSize: 15,
+    fontFamily: "inherit",
+    transition: "all 0.3s ease",
 };
 
 const buttonStyle = {
     width: "100%",
     padding: 13,
-    background: "#2563eb",
+    background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)",
     color: "white",
     border: "none",
     borderRadius: 10,
     fontSize: 16,
+    fontWeight: "600",
     cursor: "pointer",
+    transition: "all 0.3s ease",
 };
 
 const gridStyle = {
@@ -276,12 +288,13 @@ const cardStyle = {
     borderRadius: 14,
     padding: 16,
     boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+    transition: "all 0.3s ease",
 };
 
 const previewStyle = {
     width: "100%",
     height: 160,
     objectFit: "contain",
-    background: "#111827",
+    background: "#f3f4f6",
     borderRadius: 10,
 };

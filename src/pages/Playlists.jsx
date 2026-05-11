@@ -61,9 +61,9 @@ export default function Playlists() {
 
     return (
         <Layout>
-            <h1>Playlists</h1>
+            <h1 style={{ color: "#003366", marginBottom: 8 }}>Playlists</h1>
 
-            <p>
+            <p style={{ color: "#64748b", marginBottom: 24 }}>
                 Organizá los contenidos que se mostrarán en cada pantalla.
             </p>
 
@@ -75,7 +75,7 @@ export default function Playlists() {
 
             <div style={containerStyle}>
                 <form onSubmit={handleSubmit} style={formStyle}>
-                    <h2>Nueva playlist</h2>
+                    <h2 style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Nueva playlist</h2>
 
                     <label>Nombre</label>
 
@@ -101,40 +101,45 @@ export default function Playlists() {
                 </form>
 
                 <div style={listStyle}>
-                    <h2>Playlists creadas</h2>
+                    <h2 style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Playlists creadas</h2>
 
-                    {playlists.map((playlist) => (
-                        <div key={playlist.id} style={cardStyle}>
-                            <h3>{playlist.name}</h3>
+                    {playlists.length === 0 ? (
+                        <p style={{ color: "#94a3b8", textAlign: "center", padding: 40 }}>No hay playlists creadas aún</p>
+                    ) : (
+                        playlists.map((playlist) => (
+                            <div key={playlist.id} style={cardStyle}>
+                                <h3 style={{ color: "#003366", fontSize: 16, margin: "0 0 8px" }}>{playlist.name}</h3>
 
-                            <p>{playlist.description || "Sin descripción"}</p>
+                                <p style={{ color: "#64748b", fontSize: 14, margin: "0 0 12px" }}>{playlist.description || <em>Sin descripción</em>}</p>
 
-                            <small>
-                                {new Date(playlist.created_at).toLocaleString("es-AR", {
-                                    timeZone: "America/Argentina/Cordoba",
-                                })}
-                            </small>
+                                <small style={{ color: "#94a3b8", fontSize: 12 }}>
+                                    {new Date(playlist.created_at).toLocaleString("es-AR", {
+                                        timeZone: "America/Argentina/Cordoba",
+                                    })}
+                                </small>
 
-                            <br />
+                                <br />
 
-                            <Link
-                                to={`/playlists/${playlist.id}`}
-                                style={{
-                                    display: "inline-block",
-                                    marginTop: 12,
-                                    background: "var(--color-primary)",
-                                    color: "white",
-                                    padding: "9px 12px",
-                                    borderRadius: 8,
-                                    textDecoration: "none",
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                Administrar
-                            </Link>
-                            
-                        </div>
-                    ))}
+                                <Link
+                                    to={`/playlists/${playlist.id}`}
+                                    style={{
+                                        display: "inline-block",
+                                        marginTop: 12,
+                                        background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)",
+                                        color: "white",
+                                        padding: "9px 12px",
+                                        borderRadius: 8,
+                                        textDecoration: "none",
+                                        fontWeight: "bold",
+                                        fontSize: 13,
+                                        transition: "all 0.3s ease",
+                                    }}
+                                >
+                                    Administrar
+                                </Link>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </Layout>
@@ -152,8 +157,8 @@ const formStyle = {
     background: "white",
     padding: 24,
     borderRadius: 14,
-    border: "1px solid var(--color-border)",
-    boxShadow: "var(--shadow)",
+    border: "1px solid #e5e7eb",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
 };
 
 const listStyle = {
@@ -163,10 +168,11 @@ const listStyle = {
 
 const cardStyle = {
     background: "white",
-    border: "1px solid var(--color-border)",
+    border: "1px solid #e5e7eb",
     borderRadius: 14,
     padding: 18,
-    boxShadow: "var(--shadow)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+    transition: "all 0.3s ease",
 };
 
 const inputStyle = {
@@ -175,16 +181,22 @@ const inputStyle = {
     padding: 12,
     marginTop: 6,
     marginBottom: 14,
-    border: "1px solid var(--color-border)",
+    border: "2px solid #e5e7eb",
     borderRadius: 10,
+    fontSize: 15,
+    fontFamily: "inherit",
+    transition: "all 0.3s ease",
 };
 
 const buttonStyle = {
     width: "100%",
     padding: 13,
-    background: "var(--color-primary)",
+    background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)",
     color: "white",
     border: "none",
     borderRadius: 10,
     fontWeight: "bold",
+    fontSize: 15,
+    cursor: "pointer",
+    transition: "all 0.3s ease",
 };
