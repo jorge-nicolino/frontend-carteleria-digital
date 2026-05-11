@@ -1,70 +1,56 @@
-export default function AlertMessage({ type = "success", message, onClose }) {
-    if (!message) return null;
-
-    const config = {
-        success: {
-            icon: "✅",
-            background: "linear-gradient(135deg, #e6f4ea 0%, #d1f0e0 100%)",
-            color: "#0f9d58",
-            border: "#0f9d58",
-        },
-        error: {
-            icon: "❌",
-            background: "linear-gradient(135deg, #fde8ea 0%, #fcd5d9 100%)",
-            color: "#e63946",
-            border: "#e63946",
-        },
-        warning: {
-            icon: "⚠️",
-            background: "linear-gradient(135deg, #fff7db 0%, #ffeed4 100%)",
-            color: "#9a6b00",
-            border: "#f4b400",
-        },
-    };
-
-    const selected = config[type] || config.success;
+export default function Layout({ children }) {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     return (
         <div
             style={{
-                background: selected.background,
-                color: selected.color,
-                border: `2px solid ${selected.border}`,
-                borderRadius: 12,
-                padding: "14px 16px",
-                margin: "16px 0",
+                minHeight: "100vh",
+                background: "#f8fafc",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-                fontWeight: 600,
-                fontSize: 14,
-                animation: "slideInDown 0.4s ease-out",
+                flexDirection: "column",
             }}
         >
-            <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 18 }}>{selected.icon}</span>
-                <span>{message}</span>
-            </span>
+            <header
+                style={{
+                    background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)",
+                    color: "white",
+                    padding: "16px 24px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+            >
+                <div>
+                    <h2 style={{ margin: 0, fontSize: 22 }}>
+                        Cartelería Digital
+                    </h2>
 
-            {onClose && (
-                <button
-                    onClick={onClose}
-                    style={{
-                        border: "none",
-                        background: "transparent",
-                        fontSize: 20,
-                        cursor: "pointer",
-                        color: selected.color,
-                        padding: 0,
-                        transition: "transform 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => e.target.style.transform = "scale(1.2)"}
-                    onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
-                >
-                    ×
-                </button>
-            )}
+                    <p style={{ margin: "4px 0 0", opacity: 0.8, fontSize: 14 }}>
+                        Instituto General Manuel Belgrano
+                    </p>
+                </div>
+
+                <div style={{ textAlign: "right" }}>
+                    <strong>{user.name || "Usuario"}</strong>
+
+                    <div style={{ fontSize: 13, opacity: 0.8 }}>
+                        {user.role || "Sin rol"}
+                    </div>
+                </div>
+            </header>
+
+            <main
+                style={{
+                    flex: 1,
+                    padding: 24,
+                    width: "100%",
+                    maxWidth: 1400,
+                    margin: "0 auto",
+                }}
+            >
+                {children}
+            </main>
         </div>
     );
 }
