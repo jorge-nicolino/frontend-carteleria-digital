@@ -5,9 +5,8 @@ import "./Login.css";
 
 export default function Login() {
     const navigate = useNavigate();
-
-    const [email, setEmail] = useState("admin@colegio.com");
-    const [password, setPassword] = useState("admin1234");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -17,19 +16,12 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const { data } = await api.post("/auth/login", {
-                email,
-                password,
-            });
-
+            const { data } = await api.post("/auth/login", { email, password });
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
-
             navigate("/dashboard");
         } catch (err) {
-            setError(
-                err.response?.data?.message || "Error al iniciar sesión"
-            );
+            setError(err.response?.data?.message || "Error al iniciar sesion");
         } finally {
             setLoading(false);
         }
@@ -39,14 +31,10 @@ export default function Login() {
         <div className="login-page">
             <form className="login-card" onSubmit={handleSubmit}>
                 <div className="logo-container">
-                    <img 
-                        src="/logo_igmb.png" 
-                        alt="Logo IGMB"
-                        className="logo-image"
-                    />
+                    <img src="/logo_igmb.png" alt="Logo IGMB" className="logo-image" />
                 </div>
 
-                <h1>Cartelería Digital</h1>
+                <h1>Carteleria Digital</h1>
                 <p>Panel administrativo del Instituto General Manuel Belgrano</p>
 
                 {error && <div className="login-error">{error}</div>}
@@ -61,13 +49,13 @@ export default function Login() {
                     disabled={loading}
                 />
 
-                <label htmlFor="password">Contraseña</label>
+                <label htmlFor="password">Contrasena</label>
                 <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="********"
                     disabled={loading}
                 />
 

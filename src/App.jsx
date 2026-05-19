@@ -6,6 +6,7 @@ import Contents from "./pages/Contents";
 import Playlists from "./pages/Playlists";
 import Screens from "./pages/Screens";
 import PlaylistDetail from "./pages/PlaylistDetail";
+import Users from "./pages/Users";
 import RoleRoute from "./components/RoleRoute";
 
 function PrivateRoute({ children }) {
@@ -36,7 +37,7 @@ export default function App() {
         path="/contents"
         element={
           <PrivateRoute>
-            <RoleRoute allowedRoles={["admin", "marketing"]}>
+            <RoleRoute allowedRoles={["admin", "marketing", "viewer"]}>
               <Contents />
             </RoleRoute>
           </PrivateRoute>
@@ -47,7 +48,7 @@ export default function App() {
         path="/playlists"
         element={
           <PrivateRoute>
-            <RoleRoute allowedRoles={["admin", "marketing"]}>
+            <RoleRoute allowedRoles={["admin", "marketing", "viewer"]}>
               <Playlists />
             </RoleRoute>
           </PrivateRoute>
@@ -58,8 +59,19 @@ export default function App() {
         path="/screens"
         element={
           <PrivateRoute>
-            <RoleRoute allowedRoles={["admin"]}>
+            <RoleRoute allowedRoles={["admin", "marketing"]}>
               <Screens />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/users"
+        element={
+          <PrivateRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <Users />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -69,7 +81,7 @@ export default function App() {
         path="/playlists/:id"
         element={
           <PrivateRoute>
-            <RoleRoute allowedRoles={["admin", "marketing"]}>
+            <RoleRoute allowedRoles={["admin", "marketing", "viewer"]}>
               <PlaylistDetail />
             </RoleRoute>
           </PrivateRoute>

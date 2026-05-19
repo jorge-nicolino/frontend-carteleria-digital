@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import api from "../api/client";
 import Layout from "../components/Layout";
 
 function formatDateArgentina(dateString) {
-    if (!dateString) return "Sin conexión";
+    if (!dateString) return "Sin conexion";
 
     return new Date(dateString).toLocaleString("es-AR", {
         timeZone: "America/Argentina/Cordoba",
@@ -17,23 +16,20 @@ function formatDateArgentina(dateString) {
 }
 
 export default function Dashboard() {
-    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const isAdmin = user.role === "admin";
-
+    const canManageScreens = ["admin", "marketing"].includes(user.role);
     const [contents, setContents] = useState([]);
     const [playlists, setPlaylists] = useState([]);
     const [screens, setScreens] = useState([]);
 
-    async function loadData() {
+    const loadData = useCallback(async function loadData() {
         try {
-            if (isAdmin) {
+            if (canManageScreens) {
                 const [contentsRes, playlistsRes, screensRes] = await Promise.all([
                     api.get("/contents"),
                     api.get("/playlists"),
                     api.get("/screens"),
                 ]);
-
                 setContents(contentsRes.data);
                 setPlaylists(playlistsRes.data);
                 setScreens(screensRes.data);
@@ -42,48 +38,35 @@ export default function Dashboard() {
                     api.get("/contents"),
                     api.get("/playlists"),
                 ]);
-
                 setContents(contentsRes.data);
                 setPlaylists(playlistsRes.data);
                 setScreens([]);
             }
         } catch (error) {
-            console.error("Error cargando dashboard:", error);
+            console.error("Error cargando tablero:", error);
         }
-    }
+    }, [canManageScreens]);
 
     useEffect(() => {
         loadData();
-    }, []);
-
-    function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/");
-    }
+    }, [loadData]);
 
     const onlineScreens = screens.filter((screen) => screen.last_connection).length;
 
     return (
         <Layout>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={headingRowStyle}>
                 <div>
-                    <h1 style={{ color: "#003366", marginBottom: 8 }}>
-                        Panel de Cartelería Digital
-                    </h1>
+                    <h1 style={{ color: "#003366", marginBottom: 8 }}>Tablero principal</h1>
                     <p style={{ color: "#64748b", marginBottom: 24 }}>
                         Bienvenido, <strong>{user.name || "Usuario"}</strong>
                     </p>
                 </div>
-
-                <button onClick={logout} style={logoutButtonStyle}>
-                    Cerrar sesión
-                </button>
             </div>
 
             <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "24px 0" }} />
 
-            <div style={{ display: "flex", gap: 20, marginTop: 30, flexWrap: "wrap" }}>
+            <div style={statsGridStyle}>
                 <div style={cardStyle}>
                     <h2 style={numberStyle}>{contents.length}</h2>
                     <p style={labelStyle}>Contenidos cargados</p>
@@ -94,61 +77,42 @@ export default function Dashboard() {
                     <p style={labelStyle}>Playlists</p>
                 </div>
 
-                <div style={cardStyle}>
-                    <h2 style={numberStyle}>{screens.length}</h2>
-                    <p style={labelStyle}>Pantallas registradas</p>
-                </div>
+                {canManageScreens && (
+                    <>
+                        <div style={cardStyle}>
+                            <h2 style={numberStyle}>{screens.length}</h2>
+                            <p style={labelStyle}>Pantallas registradas</p>
+                        </div>
 
-                <div style={cardStyle}>
-                    <h2 style={numberStyle}>{onlineScreens}/{screens.length}</h2>
-                    <p style={labelStyle}>Pantallas con conexión</p>
-                </div>
+                        <div style={cardStyle}>
+                            <h2 style={numberStyle}>{onlineScreens}/{screens.length}</h2>
+                            <p style={labelStyle}>Pantallas con conexion</p>
+                        </div>
+                    </>
+                )}
             </div>
 
-            {isAdmin && (
+            {canManageScreens && (
                 <>
-                    <h2 style={{ color: "#003366", fontSize: 20, marginTop: 40, marginBottom: 20 }}>
-                        Pantallas
-                    </h2>
+                    <h2 style={{ color: "#003366", fontSize: 20, marginTop: 40, marginBottom: 20 }}>Pantallas</h2>
 
-                    <div style={{
-                        background: "white",
-                        borderRadius: 14,
-                        overflowX: "auto",
-                        boxShadow: "0 8px 20px rgba(0,0,0,0.08)"
-                    }}>
-                        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+                    <div style={tableWrapStyle}>
+                        <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 680 }}>
                             <thead>
                                 <tr style={{ background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)" }}>
                                     <th style={tableHeaderStyle}>Nombre</th>
-                                    <th style={tableHeaderStyle}>Ubicación</th>
-                                    <th style={tableHeaderStyle}>Device ID</th>
+                                    <th style={tableHeaderStyle}>Ubicacion</th>
                                     <th style={tableHeaderStyle}>Playlist</th>
-                                    <th style={tableHeaderStyle}>Última conexión</th>
+                                    <th style={tableHeaderStyle}>Ultima conexion</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {screens.map((screen) => (
                                     <tr key={screen.id} style={{ borderTop: "1px solid #e5e7eb" }}>
                                         <td style={tableCellStyle}>{screen.name}</td>
-                                        <td style={tableCellStyle}>{screen.location}</td>
-                                        <td style={tableCellStyle}>
-                                            <code style={{
-                                                background: "#f3f4f6",
-                                                padding: "4px 8px",
-                                                borderRadius: 4,
-                                                fontSize: 12
-                                            }}>
-                                                {screen.device_id}
-                                            </code>
-                                        </td>
-                                        <td style={tableCellStyle}>
-                                            {screen.playlists?.name || <em style={{ color: "#94a3b8" }}>Sin playlist</em>}
-                                        </td>
-                                        <td style={tableCellStyle}>
-                                            {formatDateArgentina(screen.last_connection)}
-                                        </td>
+                                        <td style={tableCellStyle}>{screen.location || <em style={{ color: "#94a3b8" }}>Sin ubicacion</em>}</td>
+                                        <td style={tableCellStyle}>{screen.playlists?.name || <em style={{ color: "#94a3b8" }}>Sin playlist</em>}</td>
+                                        <td style={tableCellStyle}>{formatDateArgentina(screen.last_connection)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -160,11 +124,25 @@ export default function Dashboard() {
     );
 }
 
+const headingRowStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 16,
+    flexWrap: "wrap",
+};
+
+const statsGridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 190px), 1fr))",
+    gap: 20,
+    marginTop: 30,
+};
+
 const cardStyle = {
     background: "#ffffff",
     padding: 24,
-    borderRadius: 14,
-    minWidth: 190,
+    borderRadius: 8,
     border: "1px solid #e5e7eb",
     boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
 };
@@ -183,6 +161,13 @@ const labelStyle = {
     fontSize: 14,
 };
 
+const tableWrapStyle = {
+    background: "white",
+    borderRadius: 8,
+    overflowX: "auto",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+};
+
 const tableHeaderStyle = {
     color: "white",
     padding: "14px 16px",
@@ -197,14 +182,4 @@ const tableCellStyle = {
     padding: "14px 16px",
     color: "#374151",
     fontSize: 14,
-};
-
-const logoutButtonStyle = {
-    background: "#E63946",
-    color: "white",
-    border: "none",
-    padding: "10px 16px",
-    borderRadius: 10,
-    cursor: "pointer",
-    fontWeight: 600,
 };
