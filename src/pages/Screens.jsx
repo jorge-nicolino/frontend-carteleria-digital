@@ -31,7 +31,9 @@ export default function Screens() {
         playlist_id: "",
     });
 
-    const playerBaseUrl = useMemo(() => window.location.origin.replace(/\/$/, ""), []);
+const playerBaseUrl = import.meta.env.VITE_PLAYER_URL;
+
+const playerUrl = `${playerBaseUrl}/player?deviceId=${screen.device_id}`;
 
     async function loadData() {
         const [screensRes, playlistsRes] = await Promise.all([
