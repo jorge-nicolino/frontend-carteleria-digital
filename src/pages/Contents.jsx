@@ -18,6 +18,16 @@ export default function Contents() {
     const [editDescription, setEditDescription] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
 
+    function formatFileSize(bytes) {
+        if (!bytes) return "0 MB";
+
+        const units = ["B", "KB", "MB", "GB"];
+        const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+        const size = bytes / Math.pow(1024, index);
+
+        return `${size.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+    }
+
     async function loadContents() {
         const { data } = await api.get("/contents");
         setContents(data);
@@ -156,14 +166,34 @@ export default function Contents() {
                     <textarea style={inputStyle} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descripcion opcional" />
 
                     <label>Archivo</label>
-                    <input style={inputStyle} type="file" accept="image/jpeg,image/png,image/webp,video/mp4" onChange={(e) => setFile(e.target.files[0])} />
+                    <input
+                        style={inputStyle}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,video/mp4"
+                        onChange={(e) => {
+                            setFile(e.target.files[0]);
+                            setUploadProgress(0);
+                            setUploadStatus("");
+                        }}
+                    />
+
+                    {file && !loading && (
+                        <div style={selectedFileStyle}>
+                            <strong>{file.name}</strong>
+                            <span>{formatFileSize(file.size)}</span>
+                        </div>
+                    )}
 
                     <button style={buttonStyle} disabled={loading}>
-                        {loading ? "Subiendo..." : "Subir contenido"}
+                        {loading ? `Subiendo ${uploadProgress}%` : "Subir contenido"}
                     </button>
 
                     {loading && (
                         <div style={uploadBoxStyle}>
+                            <div style={uploadHeaderStyle}>
+                                <strong>{uploadProgress}%</strong>
+                                <span>{file?.name || "Archivo seleccionado"}</span>
+                            </div>
                             <div style={progressTrackStyle}>
                                 <div style={{ ...progressBarStyle, width: `${uploadProgress}%` }} />
                             </div>
@@ -251,16 +281,45 @@ const buttonStyle = {
     cursor: "pointer",
 };
 
+const selectedFileStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 12,
+    alignItems: "center",
+    background: "#eef6ff",
+    color: "#003366",
+    border: "1px solid #bfdbfe",
+    borderRadius: 8,
+    padding: "10px 12px",
+    marginBottom: 14,
+    fontSize: 13,
+};
+
 const uploadBoxStyle = {
-    marginTop: 12,
+    marginTop: 14,
+    background: "#f8fafc",
+    border: "1px solid #dbeafe",
+    borderRadius: 8,
+    padding: 12,
+};
+
+const uploadHeaderStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 12,
+    alignItems: "center",
+    color: "#003366",
+    fontSize: 14,
+    marginBottom: 10,
 };
 
 const progressTrackStyle = {
     width: "100%",
-    height: 8,
+    height: 14,
     background: "#e5e7eb",
     borderRadius: 999,
     overflow: "hidden",
+    border: "1px solid #cbd5e1",
 };
 
 const progressBarStyle = {
