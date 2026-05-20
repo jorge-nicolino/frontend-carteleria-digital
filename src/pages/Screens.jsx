@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import api from "../api/client";
 import AlertMessage from "../components/AlertMessage";
@@ -31,9 +31,7 @@ export default function Screens() {
         playlist_id: "",
     });
 
-const playerBaseUrl = import.meta.env.VITE_PLAYER_URL;
-
-const playerUrl = `${playerBaseUrl}/player?deviceId=${screen.device_id}`;
+    const playerBaseUrl = import.meta.env.VITE_PLAYER_URL || window.location.origin.replace(/\/$/, "");
 
     async function loadData() {
         const [screensRes, playlistsRes] = await Promise.all([

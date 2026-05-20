@@ -11,6 +11,8 @@ export default function Contents() {
     const [description, setDescription] = useState("");
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadStatus, setUploadStatus] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editDescription, setEditDescription] = useState("");
@@ -40,8 +42,22 @@ export default function Contents() {
 
         try {
             setLoading(true);
+            setUploadProgress(0);
+            setUploadStatus("Preparando archivo...");
+
             await api.post("/contents/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
+                timeout: 15 * 60 * 1000,
+                onUploadProgress: (progressEvent) => {
+                    if (!progressEvent.total) {
+                        setUploadStatus("Subiendo archivo...");
+                        return;
+                    }
+
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percent);
+                    setUploadStatus(percent >= 100 ? "Procesando video en el servidor..." : `Subiendo archivo... ${percent}%`);
+                },
             });
 
             setTitle("");
@@ -52,12 +68,20 @@ export default function Contents() {
             await loadContents();
             setAlert({ type: "success", message: "Contenido subido correctamente." });
         } catch (error) {
+            await loadContents().catch(() => {});
+
+            const timeoutMessage = "La carga tardo demasiado. Si el contenido aparece en la lista, se subio correctamente; si no, intenta con un archivo mas liviano.";
+
             setAlert({
                 type: "error",
-                message: error.response?.data?.message || "Error subiendo contenido.",
+                message: error.code === "ECONNABORTED"
+                    ? timeoutMessage
+                    : error.response?.data?.message || "Error subiendo contenido.",
             });
         } finally {
             setLoading(false);
+            setUploadProgress(0);
+            setUploadStatus("");
         }
     }
 
@@ -137,6 +161,17 @@ export default function Contents() {
                     <button style={buttonStyle} disabled={loading}>
                         {loading ? "Subiendo..." : "Subir contenido"}
                     </button>
+
+                    {loading && (
+                        <div style={uploadBoxStyle}>
+                            <div style={progressTrackStyle}>
+                                <div style={{ ...progressBarStyle, width: `${uploadProgress}%` }} />
+                            </div>
+                            <p style={uploadTextStyle}>
+                                {uploadStatus || "Subiendo archivo..."}
+                            </p>
+                        </div>
+                    )}
                 </form>
             )}
 
@@ -214,6 +249,30 @@ const buttonStyle = {
     fontSize: 15,
     fontWeight: "600",
     cursor: "pointer",
+};
+
+const uploadBoxStyle = {
+    marginTop: 12,
+};
+
+const progressTrackStyle = {
+    width: "100%",
+    height: 8,
+    background: "#e5e7eb",
+    borderRadius: 999,
+    overflow: "hidden",
+};
+
+const progressBarStyle = {
+    height: "100%",
+    background: "linear-gradient(135deg, #003366 0%, #004B8C 100%)",
+    transition: "width 0.2s ease",
+};
+
+const uploadTextStyle = {
+    color: "#64748b",
+    fontSize: 13,
+    margin: "8px 0 0",
 };
 
 const secondaryButtonStyle = {
