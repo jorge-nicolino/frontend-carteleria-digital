@@ -56,8 +56,7 @@ export default function Contents() {
             setUploadStatus("Preparando archivo...");
 
             await api.post("/contents/upload", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                timeout: 15 * 60 * 1000,
+                timeout: 2 * 60 * 1000,
                 onUploadProgress: (progressEvent) => {
                     if (!progressEvent.total) {
                         setUploadStatus("Subiendo archivo...");
@@ -66,7 +65,7 @@ export default function Contents() {
 
                     const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                     setUploadProgress(percent);
-                    setUploadStatus(percent >= 100 ? "Procesando video en el servidor..." : `Subiendo archivo... ${percent}%`);
+                    setUploadStatus(percent >= 100 ? "Guardando datos del contenido..." : `Subiendo archivo... ${percent}%`);
                 },
             });
 
@@ -80,7 +79,7 @@ export default function Contents() {
         } catch (error) {
             await loadContents().catch(() => {});
 
-            const timeoutMessage = "La carga tardo demasiado. Si el contenido aparece en la lista, se subio correctamente; si no, intenta con un archivo mas liviano.";
+            const timeoutMessage = "La carga tardo demasiado. Si el contenido aparece en la lista, se subio correctamente; si no, intenta nuevamente.";
 
             setAlert({
                 type: "error",
