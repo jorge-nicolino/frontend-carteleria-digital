@@ -56,7 +56,6 @@ export default function Contents() {
             setUploadStatus("Preparando archivo...");
 
             await api.post("/contents/upload", formData, {
-                timeout: 2 * 60 * 1000,
                 onUploadProgress: (progressEvent) => {
                     if (!progressEvent.total) {
                         setUploadStatus("Subiendo archivo...");
@@ -79,13 +78,9 @@ export default function Contents() {
         } catch (error) {
             await loadContents().catch(() => {});
 
-            const timeoutMessage = "La carga tardo demasiado. Si el contenido aparece en la lista, se subio correctamente; si no, intenta nuevamente.";
-
             setAlert({
                 type: "error",
-                message: error.code === "ECONNABORTED"
-                    ? timeoutMessage
-                    : error.response?.data?.message || "Error subiendo contenido.",
+                message: error.response?.data?.message || "Error subiendo contenido.",
             });
         } finally {
             setLoading(false);
