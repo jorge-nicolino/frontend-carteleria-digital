@@ -28,6 +28,13 @@ export default function Contents() {
         return `${size.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
     }
 
+    function getVideoThumbnailUrl(content) {
+        if (!content?.file_url || !content?.file_name) return undefined;
+
+        const thumbnailName = content.file_name.replace(/\.[^.]+$/, ".jpg");
+        return content.file_url.replace(`/videos/${encodeURIComponent(content.file_name)}`, `/thumbnails/${encodeURIComponent(thumbnailName)}`);
+    }
+
     async function loadContents() {
         const { data } = await api.get("/contents");
         setContents(data);
@@ -163,7 +170,7 @@ export default function Contents() {
                     <input
                         style={inputStyle}
                         type="file"
-                        accept="image/jpeg,image/png,image/webp,video/mp4"
+                        accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,.mp4,.mov,.avi,.mkv,.webm,.m4v"
                         onChange={(e) => {
                             setFile(e.target.files[0]);
                             setUploadProgress(0);
@@ -207,7 +214,7 @@ export default function Contents() {
                         {content.type === "image" ? (
                             <img src={content.file_url} alt={content.title} style={previewStyle} />
                         ) : (
-                            <video src={content.file_url} controls style={previewStyle} />
+                            <video src={content.file_url} poster={getVideoThumbnailUrl(content)} controls style={previewStyle} />
                         )}
 
                         {canEdit && editingId === content.id ? (
