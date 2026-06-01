@@ -28,6 +28,23 @@ export default function Contents() {
         return `${size.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
     }
 
+    function getReductionPercent(stats) {
+        if (!stats?.original_size_bytes || !stats?.saved_bytes) return 0;
+        return Math.round((stats.saved_bytes * 100) / stats.original_size_bytes);
+    }
+
+    function getUploadSummary(stats) {
+        if (!stats?.final_size_bytes) return "";
+
+        const reductionPercent = getReductionPercent(stats);
+
+        if (reductionPercent > 0) {
+            return ` Peso original: ${formatFileSize(stats.original_size_bytes)}. Guardado: ${formatFileSize(stats.final_size_bytes)}. Reduccion: ${reductionPercent}%.`;
+        }
+
+        return ` Peso guardado: ${formatFileSize(stats.final_size_bytes)}. No se redujo el archivo.`;
+    }
+
     function getVideoThumbnailUrl(content) {
         if (!content?.file_url || !content?.file_name) return undefined;
 
@@ -62,7 +79,7 @@ export default function Contents() {
             setUploadProgress(0);
             setUploadStatus("Preparando archivo...");
 
-            await api.post("/contents/upload", formData, {
+            const { data } = await api.post("/contents/upload", formData, {
                 onUploadProgress: (progressEvent) => {
                     if (!progressEvent.total) {
                         setUploadStatus("Subiendo archivo...");
@@ -81,7 +98,10 @@ export default function Contents() {
             e.target.reset();
 
             await loadContents();
-            setAlert({ type: "success", message: "Contenido subido correctamente." });
+            setAlert({
+                type: "success",
+                message: `Contenido subido correctamente.${getUploadSummary(data.upload)}`,
+            });
         } catch (error) {
             await loadContents().catch(() => {});
 
@@ -242,6 +262,32 @@ export default function Contents() {
                         <p style={{ color: "#64748b", fontSize: 12, marginTop: 12, marginBottom: 0 }}>
                             <strong>Tipo:</strong> {content.type}
                         </p>
+
+                        {content.upload_stats?.final_size_bytes && (
+                            <div style={statsBoxStyle}>
+                                <div style={statsLineStyle}>
+                                    <strong>Peso guardado</strong>
+                                    <span>{formatFileSize(content.upload_stats.final_size_bytes)}</span>
+                                </div>
+                                {content.upload_stats.saved_bytes > 0 ? (
+                                    <div style={statsLineStyle}>
+                                        <strong>Reduccion</strong>
+                                        <span>{getReductionPercent(content.upload_stats)}% ({formatFileSize(content.upload_stats.saved_bytes)})</span>
+                                    </div>
+                                ) : (
+                                    <div style={statsLineStyle}>
+                                        <strong>Reduccion</strong>
+                                        <span>No reducido</span>
+                                    </div>
+                                )}
+                                {content.upload_stats.original_size_bytes && (
+                                    <div style={statsLineStyle}>
+                                        <strong>Original</strong>
+                                        <span>{formatFileSize(content.upload_stats.original_size_bytes)}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
@@ -350,6 +396,24 @@ const buttonRowStyle = {
     gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
     gap: 10,
     marginTop: 10,
+};
+
+const statsBoxStyle = {
+    display: "grid",
+    gap: 6,
+    background: "#f8fafc",
+    border: "1px solid #e5e7eb",
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 12,
+    color: "#334155",
+    fontSize: 12,
+};
+
+const statsLineStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 10,
 };
 
 const gridStyle = {
