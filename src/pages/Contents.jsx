@@ -36,6 +36,10 @@ export default function Contents() {
     function getUploadSummary(stats) {
         if (!stats?.final_size_bytes) return "";
 
+        if (stats.optimization_status === "pending") {
+            return ` Video guardado: ${formatFileSize(stats.final_size_bytes)}. La reduccion se procesa en segundo plano.`;
+        }
+
         const reductionPercent = getReductionPercent(stats);
 
         if (reductionPercent > 0) {
@@ -43,6 +47,13 @@ export default function Contents() {
         }
 
         return ` Peso guardado: ${formatFileSize(stats.final_size_bytes)}. No se redujo el archivo.`;
+    }
+
+    function getOptimizationLabel(stats) {
+        if (stats?.optimization_status === "pending") return "Procesando";
+        if (stats?.optimization_status === "failed") return "Fallo";
+        if (stats?.saved_bytes > 0) return `${getReductionPercent(stats)}% (${formatFileSize(stats.saved_bytes)})`;
+        return "No reducido";
     }
 
     function getVideoThumbnailUrl(content) {
@@ -60,6 +71,18 @@ export default function Contents() {
     useEffect(() => {
         loadContents();
     }, []);
+
+    useEffect(() => {
+        const hasPendingOptimization = contents.some((content) => content.upload_stats?.optimization_status === "pending");
+
+        if (!hasPendingOptimization) return undefined;
+
+        const intervalId = setInterval(() => {
+            loadContents().catch(() => {});
+        }, 7000);
+
+        return () => clearInterval(intervalId);
+    }, [contents]);
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -269,17 +292,10 @@ export default function Contents() {
                                     <strong>Peso guardado</strong>
                                     <span>{formatFileSize(content.upload_stats.final_size_bytes)}</span>
                                 </div>
-                                {content.upload_stats.saved_bytes > 0 ? (
-                                    <div style={statsLineStyle}>
-                                        <strong>Reduccion</strong>
-                                        <span>{getReductionPercent(content.upload_stats)}% ({formatFileSize(content.upload_stats.saved_bytes)})</span>
-                                    </div>
-                                ) : (
-                                    <div style={statsLineStyle}>
-                                        <strong>Reduccion</strong>
-                                        <span>No reducido</span>
-                                    </div>
-                                )}
+                                <div style={statsLineStyle}>
+                                    <strong>Reduccion</strong>
+                                    <span>{getOptimizationLabel(content.upload_stats)}</span>
+                                </div>
                                 {content.upload_stats.original_size_bytes && (
                                     <div style={statsLineStyle}>
                                         <strong>Original</strong>
