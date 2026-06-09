@@ -24,6 +24,7 @@ export default function Screens() {
     const [playlistId, setPlaylistId] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
     const [selectedPlaylists, setSelectedPlaylists] = useState({});
+    const [screenVideoDownloads, setScreenVideoDownloads] = useState({});
     const [editingId, setEditingId] = useState(null);
     const [editScreen, setEditScreen] = useState({
         name: "",
@@ -39,14 +40,42 @@ export default function Screens() {
             api.get("/playlists"),
         ]);
 
-        setScreens(screensRes.data);
+        const screensData = screensRes.data;
+
+        setScreens(screensData);
         setPlaylists(playlistsRes.data);
 
         const initialSelected = {};
-        screensRes.data.forEach((screen) => {
+        screensData.forEach((screen) => {
             initialSelected[screen.id] = screen.playlist_id || "";
         });
         setSelectedPlaylists(initialSelected);
+
+        const videoDownloadEntries = await Promise.all(
+            screensData.map(async (screen) => {
+                if (!screen.playlist_id) {
+                    return [screen.id, []];
+                }
+
+                try {
+                    const { data } = await api.get(`/player/${encodeURIComponent(screen.device_id)}`);
+                    const videos = (data.items || [])
+                        .map((item) => item.contents)
+                        .filter((content) => content?.type === "video" && /\.mp4$/i.test(content.file_name || ""))
+                        .map((content) => ({
+                            id: content.id,
+                            title: content.title || "Video",
+                            file_name: content.file_name || "",
+                        }));
+
+                    return [screen.id, videos];
+                } catch {
+                    return [screen.id, []];
+                }
+            })
+        );
+
+        setScreenVideoDownloads(Object.fromEntries(videoDownloadEntries));
     }
 
     useEffect(() => {
@@ -148,6 +177,14 @@ export default function Screens() {
                 message: error.response?.data?.message || "Error eliminando pantalla.",
             });
         }
+    }
+
+    function getPlayerDownloadUrl(screen, videoIndex) {
+        return `${playerBaseUrl}/player?deviceId=${encodeURIComponent(screen.device_id)}&download=1&video=${videoIndex + 1}`;
+    }
+
+    function getDownloadableVideos(screen) {
+        return screenVideoDownloads[screen.id] || [];
     }
 
     return (
@@ -262,10 +299,26 @@ export default function Screens() {
                                             <strong>Ultima conexion:</strong> {formatDateArgentina(screen.last_connection)}
                                         </p>
 
-                                        <p style={metaStyle}><strong>URL Player:</strong></p>
+                                        <p style={metaStyle}><strong>URL Player web:</strong></p>
                                         <code style={codeBlockStyle}>
                                             {playerBaseUrl}/player?deviceId={screen.device_id}
                                         </code>
+
+                                        <p style={{ ...metaStyle, marginTop: 10 }}><strong>URLs Player MP4:</strong></p>
+                                        {getDownloadableVideos(screen).length === 0 ? (
+                                            <p style={metaStyle}>Sin videos MP4 descargables</p>
+                                        ) : (
+                                            getDownloadableVideos(screen).map((video, index) => (
+                                                <div key={`${video.id}-${index}`} style={downloadUrlStyle}>
+                                                    <p style={metaStyle}>
+                                                        <strong>{index + 1}. {video.title}</strong>
+                                                    </p>
+                                                    <code style={codeBlockStyle}>
+                                                        {getPlayerDownloadUrl(screen, index)}
+                                                    </code>
+                                                </div>
+                                            ))
+                                        )}
                                     </>
                                 )}
                             </div>
@@ -369,4 +422,8 @@ const codeBlockStyle = {
     fontSize: 12,
     color: "#003366",
     fontWeight: "500",
+};
+
+const downloadUrlStyle = {
+    marginBottom: 10,
 };
